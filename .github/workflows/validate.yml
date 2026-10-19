@@ -17,7 +17,7 @@ jobs:
         run: pip install -r app/requirements.txt -r tests/requirements.txt
       - name: Application tests
         run: pytest -q tests
-      - uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: '1.11.4'
       - name: Terraform formatting
