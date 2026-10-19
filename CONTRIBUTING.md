@@ -6,7 +6,7 @@ Start with an issue for changes that affect the architecture or deployment proce
 
 1. Create a branch from `main` with a short, descriptive name.
 2. Make a focused change. Update the relevant runbook and diagram if behavior changes.
-3. Run the application tests and Terraform checks listed in the [README](README.md#build-and-test).
+3. Run the application tests and Terraform checks listed in the [README](README.md#tests).
 4. Open a pull request explaining the problem, the change and what you tested.
 
 Use clear commit messages such as `Fix ALB health check documentation`. Keep unrelated changes in separate pull requests.
