@@ -1,0 +1,6 @@
+Original learning-project implementation prepared for Kareem Saeed.
+Documentation structure was informed by the AWS Solutions Dynamic Image Transformation for Amazon CloudFront repository.
+No AWS sample application source code is copied. This project is not an AWS official solution or endorsement.
+Service names and trademarks belong to their respective owners.
+
+AWS architecture icon artwork in docs/architecture/aws-icons and embedded in the diagrams is provided by Amazon Web Services under its own terms; it is not relicensed under this project's MIT license. See docs/architecture/AWS-ICON-ATTRIBUTION.md.

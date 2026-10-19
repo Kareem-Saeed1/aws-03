@@ -1,0 +1,29 @@
+name: Bug report
+description: Report a reproducible problem with the application, infrastructure or documentation.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, Terraform state, saved plans or sensitive logs. Follow SECURITY.md for vulnerability reports.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the expected result and actual behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Terraform and Python versions, AWS Region and the relevant configuration without secrets.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs or screenshots

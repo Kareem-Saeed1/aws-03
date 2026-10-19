@@ -1,0 +1,49 @@
+#!/bin/bash
+set -euo pipefail
+# Never enable shell tracing here; secrets must not enter cloud-init logs.
+dnf install -y python3.11 python3.11-pip unzip amazon-cloudwatch-agent
+id webapp >/dev/null 2>&1 || useradd --system --home-dir /opt/webapp --shell /sbin/nologin webapp
+mkdir -p /opt/webapp /var/log/webapp
+aws s3 cp 's3://${bucket}/${key}' /tmp/app.zip --region '${region}'
+unzip -o /tmp/app.zip -d /opt/webapp
+python3.11 -m venv /opt/webapp/.venv
+/opt/webapp/.venv/bin/pip install --requirement /opt/webapp/requirements.txt
+curl --fail --silent --show-error --retry 5 https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem -o /opt/webapp/rds-ca.pem
+cat > /etc/webapp.env <<'ENV'
+AWS_DEFAULT_REGION=${region}
+APP_SECRET_ARN=${app_secret}
+ADMIN_SECRET_ARN=${admin_secret}
+DB_HOST=${db_host}
+DB_NAME=webapp
+DB_SSLROOTCERT=/opt/webapp/rds-ca.pem
+STATIC_BASE_URL=${static_url}
+ENV
+chmod 600 /etc/webapp.env
+chown -R webapp:webapp /opt/webapp /var/log/webapp
+cat > /etc/systemd/system/webapp.service <<'UNIT'
+[Unit]
+Description=Scalable Web Application
+After=network-online.target
+Wants=network-online.target
+[Service]
+User=webapp
+Group=webapp
+WorkingDirectory=/opt/webapp
+EnvironmentFile=/etc/webapp.env
+ExecStart=/opt/webapp/.venv/bin/gunicorn --workers 2 --bind 0.0.0.0:8000 --timeout 30 --access-logfile /var/log/webapp/access.log --error-logfile /var/log/webapp/error.log app:app
+Restart=always
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/webapp
+[Install]
+WantedBy=multi-user.target
+UNIT
+cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<'JSON'
+{"logs":{"logs_collected":{"files":{"collect_list":[{"file_path":"/var/log/webapp/error.log","log_group_name":"${log_group}","log_stream_name":"{instance_id}/error"},{"file_path":"/var/log/webapp/access.log","log_group_name":"${log_group}","log_stream_name":"{instance_id}/access"},{"file_path":"/var/log/cloud-init-output.log","log_group_name":"${log_group}","log_stream_name":"{instance_id}/bootstrap"}]}},"force_flush_interval":5}}
+JSON
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+systemctl daemon-reload
+systemctl enable --now webapp

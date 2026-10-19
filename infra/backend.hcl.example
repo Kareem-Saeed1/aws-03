@@ -1,0 +1,5 @@
+bucket = "REPLACE_WITH_YOUR_STATE_BUCKET"
+key = "scalable-webapp/terraform.tfstate"
+region = "eu-west-1"
+encrypt = true
+use_lockfile = true

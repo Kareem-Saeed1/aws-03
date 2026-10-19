@@ -1,0 +1,17 @@
+name: Feature request
+description: Suggest an improvement to this project.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Include alternatives and any impact on deployment, security or cost.
+    validations:
+      required: true

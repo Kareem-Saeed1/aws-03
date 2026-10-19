@@ -1,0 +1,31 @@
+name: Validate project
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r app/requirements.txt -r tests/requirements.txt
+      - name: Application tests
+        run: pytest -q tests
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.11.4'
+      - name: Terraform formatting
+        run: terraform fmt -check -recursive infra
+      - name: Terraform validation
+        run: |
+          terraform -chdir=infra init -backend=false -input=false
+          terraform -chdir=infra validate
+          terraform -chdir=infra/bootstrap init -backend=false -input=false
+          terraform -chdir=infra/bootstrap validate
+# This workflow validates only. It has no AWS credentials and does not deploy resources.

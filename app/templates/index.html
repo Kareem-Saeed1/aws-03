@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cloud Taskboard | AWS Scalable Web Application</title>
+  <link rel="stylesheet" href="{{ css_url }}">
+</head>
+<body>
+  <header><span class="brand">CLOUD / TASKBOARD</span><span class="tag">AWS ARCHITECTURE LAB</span></header>
+  <main>
+    <p class="eyebrow">PROJECT 01 · EC2 + AUTO SCALING</p>
+    <h1>A small application.<br>A resilient foundation.</h1>
+    <p class="intro">Tasks persist in PostgreSQL across application instance replacements. Static styling is delivered through CloudFront.</p>
+    <section class="metrics"><div><b>02</b><span>Availability Zones</span></div><div><b>ALB + ASG</b><span>Application delivery</span></div><div><b>Multi-AZ</b><span>Database deployment</span></div></section>
+    <section class="panel"><h2>Create a task</h2>
+      <form action="/tasks" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label for="title">Task name</label>
+        <div class="form-row"><input id="title" name="title" maxlength="200" required placeholder="Verify instance replacement"><button type="submit">Add task</button></div>
+      </form>
+    </section>
+    <section class="panel"><div class="section-head"><h2>Recent tasks</h2><span>Latest 50</span></div>
+      {% for id, title, created_at in tasks %}<article class="task"><span class="number">#{{ id }}</span><strong>{{ title }}</strong><time>{{ created_at.strftime('%d %b %Y · %H:%M UTC') }}</time></article>
+      {% else %}<p class="empty">Your board is ready. Add a task to verify database persistence.</p>{% endfor %}
+    </section>
+    <p class="footnote">Learning reference · Shared demo access · Infrastructure labels describe the design, not live health telemetry.</p>
+  </main>
+</body>
+</html>
