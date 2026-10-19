@@ -113,4 +113,4 @@ resource "aws_vpc_endpoint" "s3" {
 
 }
 # Default NACL retained intentionally. Stateful SGs enforce the tier boundaries.
-# Custom NACLs require explicit ephemeral return ports; see docs/SECURITY.md.
+# Custom NACLs require explicit ephemeral return ports.
